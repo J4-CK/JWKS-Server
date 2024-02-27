@@ -1,0 +1,16 @@
+Prior to running server:
+pip install Flask cryptography
+
+to run server:
+in terminal cd to 
+C:\Users\jgidd\OneDrive\Desktop\Classes\CSCE3550\JWKS_test 
+
+then, do 
+python .\test_jwks_server.py
+
+
+To test server:
+curl "http://localhost:8080/auth?user_id=123"
+
+//expired test
+curl "http://localhost:8080/auth?user_id=123&expired=true"
