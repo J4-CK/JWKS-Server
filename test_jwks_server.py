@@ -84,7 +84,7 @@ sample_key = {
 jwks = {"keys": [sample_key]}
 
 #refresh of the previously static sample key
-refresh_key()
+refresh_keys()
 
 
 @app.route("/jwks")
