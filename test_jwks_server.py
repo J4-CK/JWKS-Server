@@ -111,7 +111,8 @@ def generate_jwt(user_id):
     }
     
     #Generate the JWT token using PyJWT library
-    jwt_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256").decode("utf-8")
+    #corrected by removing .decode as jwt.encode as apparently decoding utf-8 is unnecessary
+    jwt_token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     
     return jwt_token
 
