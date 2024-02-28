@@ -1,0 +1,58 @@
+#tester_for_jwks_server.py
+import unittest
+import requests
+
+class TestJWKSServer(unittest.TestCase):
+    # Setup method to initialize resources needed for testing
+    def setUp(self):
+        self.base_url = "http://127.0.0.1:8080"  # Update with your server's URL
+
+    # Teardown method to clean up after testing
+    def tearDown(self):
+        pass
+
+    # Test case for /jwks endpoint
+    def test_jwks_endpoint(self):
+        response = requests.get(f"{self.base_url}/jwks")
+        self.assertEqual(response.status_code, 200)
+        jwks_data = response.json()
+        self.assertIn("keys", jwks_data)
+        self.assertIsInstance(jwks_data["keys"], list)
+        # Add more assertions to check the response data if needed
+
+    # Test case for /auth endpoint
+    def test_auth_endpoint(self):
+        # Test without expired parameter
+        response = requests.post(f"{self.base_url}/auth?user_id=123")
+        self.assertEqual(response.status_code, 200)
+        auth_data = response.json()
+        self.assertIn("jwt_token", auth_data)
+        jwt_token = auth_data["jwt_token"]
+        # Add assertions to check the JWT token if needed
+
+        # Test with expired parameter
+        response_expired = requests.post(f"{self.base_url}/auth?user_id=123&expired")
+        self.assertEqual(response_expired.status_code, 200)
+        auth_expired_data = response_expired.json()
+        self.assertIn("jwt_token", auth_expired_data)
+        jwt_expired_token = auth_expired_data["jwt_token"]
+        # Add assertions to check the JWT token if needed
+
+        # Test with different user IDs
+        response_user2 = requests.post(f"{self.base_url}/auth?user_id=456")
+        self.assertEqual(response_user2.status_code, 200)
+        auth_user2_data = response_user2.json()
+        self.assertIn("jwt_token", auth_user2_data)
+        jwt_user2_token = auth_user2_data["jwt_token"]
+        # Add assertions to check the JWT token if needed
+
+        # Test expiration handling
+        response_expired_handling = requests.post(f"{self.base_url}/auth?user_id=789&expired")
+        self.assertEqual(response_expired_handling.status_code, 200)
+        auth_expired_handling_data = response_expired_handling.json()
+        self.assertIn("jwt_token", auth_expired_handling_data)
+        jwt_expired_handling_token = auth_expired_handling_data["jwt_token"]
+        # Add assertions to check the JWT token if needed
+
+if __name__ == "__main__":
+    unittest.main()
