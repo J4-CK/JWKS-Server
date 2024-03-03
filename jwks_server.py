@@ -5,7 +5,6 @@ from cryptography.hazmat.primitives import serialization
 import jwt 
 import time
 
-
 app = Flask(__name__)
 
 #Function to generate RSA key pair with kid and exp
@@ -40,7 +39,6 @@ def generate_rsa_key():
 #Generate RSA key pair
 private_key, public_key, expiration_time = generate_rsa_key()
 
-
 #Define the function to generate JWT
 def generate_jwt(user_id, private_key, expiration_time):
     #Generation of payload for the JWT
@@ -54,22 +52,26 @@ def generate_jwt(user_id, private_key, expiration_time):
     
     return jwt_token
 
-
-
 #Define the authentication endpoint
-@app.route("/auth", methods=["POST"])
+@app.route("/auth", methods=["GET", "POST"])
 def authenticate():
     user_id = request.args.get("user_id")
 
-    #Generate a JWT with an expired key based on the query parameter
-    if request.args.get("expired"):
-        expiration_time = int(time.time()) - 3600  #Set an expired key (1 hour ago)
-
-    #Generate and return a JWT token using the actual private key
-    jwt_token = generate_jwt(user_id, private_key, expiration_time)
-    return jsonify({"jwt_token": jwt_token})
-
-
+    if request.method == "GET":
+        #get token handoff
+        jwt_token = generate_jwt(user_id, private_key, expiration_time)
+        return jsonify({"jwt_token": jwt_token})
+    elif request.method == "POST":
+        #verify token
+        jwt_token = request.json.get("jwt_token")  #Assuming JWT token is sent in the request body
+        decoded_token = jwt.decode(jwt_token, public_key, algorithms=["RS256"])
+        #Perform any necessary authentication checks using the decoded token
+        
+        #Return appropriate response based on authentication result
+        if decoded_token.get("user_id") == user_id:            
+            return jsonify({"message": "Authentication successful"})
+        else:
+            return jsonify({"message": "Authentication failed"}), 401
 
 if __name__ == "__main__":
     app.run(debug=False, port=8080)
